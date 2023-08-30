@@ -94,8 +94,5 @@ iOSInjectionProject/
 
 .vscode/
 
-# ignore root dir symbol link
-/.clang-format
-
-# ignore .githooks
+.clang-format
 .githooks

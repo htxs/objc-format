@@ -8,9 +8,10 @@ export CDPATH=""
 # 当前脚本所在目录
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # 工程根目录
-CWDBASE="$( realpath "$DIR/../../" )"
-pre_commit_file="$CWDBASE/.git/hooks/pre-commit";
-git_hooks_path="$CWDBASE/.git/hooks";
+CWDBASE="$( realpath "$DIR/../" )"
+pre_commit_file="$CWDBASE/.git/hooks/pre-commit"
+git_hooks_path="$CWDBASE/.git/hooks"
+githooks_path="$CWDBASE/.githooks"
 
 function ensure_pre_commit_file_exists() {
   if [ -e "$pre_commit_file" ]; then
@@ -58,14 +59,18 @@ function ensure_git_ignores_clang_format_file() {
   if [ $? -gt 0 ]; then
     echo ".clang-format" >> "$CWDBASE/.gitignore"
   fi
+
+  grep -q ".githooks" "$CWDBASE/.gitignore"
+  if [ $? -gt 0 ]; then
+    echo ".githooks" >> "$CWDBASE/.gitignore"
+  fi
 }
 
-function symlink_clang_format() {
-  $(ln -sf "$DIR/spacecommander/.clang-format" "$CWDBASE/.clang-format")
+function symlink_hook_clang_format() {
+  $(ln -sf "$git_hooks_path/spacecommander/.clang-format" "$CWDBASE/.clang-format")
 }
 
 function ensure_githooks_is_installed() {
-  githooks_path="$CWDBASE/.githooks"
   $(mkdir -p "$githooks_path");
   local_pre_commit_file="$DIR/pre-commit"
   local_pre_commit_dir="$DIR/pre-commit.d"
@@ -77,13 +82,17 @@ function ensure_githooks_is_installed() {
   git config core.hooksPath .githooks
 }
 
+function symlink_githooks_clang_format() {
+  $(ln -sf "$githooks_path/spacecommander/.clang-format" "$CWDBASE/.clang-format")
+}
+
 # sync git hooks
 if (echo version 2.9.5; git --version) | sort -Vk3 | tail -1  | grep -1 git >/dev/null; then
   # git version greater than 2.9.5, use core.hooksPath.
   echo "git version ≥2.9.5, use core.hooksPath config."
-  ensure_githooks_is_installed && ensure_git_ignores_clang_format_file && symlink_clang_format
+  ensure_githooks_is_installed && ensure_git_ignores_clang_format_file && symlink_githooks_clang_format
 else
   # git version less than 2.9.5, move to .git/hooks
   echo "git version <2.9.5, move to .git/hooks."
-  ensure_pre_commit_file_exists && ensure_pre_commit_file_is_executable && ensure_hook_is_installed && ensure_git_ignores_clang_format_file && symlink_clang_format
+  ensure_pre_commit_file_exists && ensure_pre_commit_file_is_executable && ensure_hook_is_installed && ensure_git_ignores_clang_format_file && symlink_hook_clang_format
 fi
