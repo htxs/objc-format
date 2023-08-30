@@ -79,7 +79,8 @@ function ensure_githooks_is_installed() {
     echo "git config core.hooksPath .githooks success."
   else
     echo "git config core.hooksPath .githooks fail."
-    return 0
+    # 此处当做异常退出，不再继续执行后续方法
+    exit -1
   fi
 
   # 创建目录

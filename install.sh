@@ -20,7 +20,7 @@ function ensure_down_githooks() {
     echo "download zip file success."
   else
     echo "download zip file fail."
-    return 0
+    exit -1
   fi
 }
 
@@ -32,11 +32,13 @@ function ensure_unzip_githooks() {
       echo "unzip file success."
     else
       echo "unzip file fail."
-      return 0
+      # 退出前删除临时文件
+      ensure_delete_files
+      exit -1
     fi
   else
     echo "zip file not exist: $tmp_githooks_zip_path"
-    return 0
+    exit -1
   fi
 }
 
@@ -47,7 +49,9 @@ function ensure_setup_githooks() {
     echo "exec githooks-setup.sh success."
   else
     echo "exec githooks-setup.sh fail."
-    return 0
+    # 退出前删除临时文件
+    ensure_delete_files
+    exit -1
   fi
 }
 
