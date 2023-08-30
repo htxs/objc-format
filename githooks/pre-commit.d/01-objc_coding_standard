@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+objc_hook_path="$DIR/../spacecommander/format-objc-hook"
+if [ -e $objc_hook_path ]; then $objc_hook_path || exit 1; fi
