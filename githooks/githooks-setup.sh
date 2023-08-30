@@ -67,23 +67,38 @@ function ensure_git_ignores_clang_format_file() {
 }
 
 function symlink_hook_clang_format() {
-  $(ln -sf "$git_hooks_path/spacecommander/.clang-format" "$CWDBASE/.clang-format")
+  source_file_path="$git_hooks_path/spacecommander/.clang-format"
+  if [ -f "$source_file_path" ]; then
+    $(ln -sf "$source_file_path" "$CWDBASE/.clang-format")
+  fi
 }
 
 function ensure_githooks_is_installed() {
+  # 优先尝试配置 git config，如果报错后，不再执行后续的复制文件
+  if git config core.hooksPath .githooks >/dev/null 2>&1; then
+    echo "git config core.hooksPath .githooks success."
+  else
+    echo "git config core.hooksPath .githooks fail."
+    return 0
+  fi
+
+  # 创建目录
   $(mkdir -p "$githooks_path");
+
+  # 拷贝 githooks 相关文件
   local_pre_commit_file="$DIR/pre-commit"
   local_pre_commit_dir="$DIR/pre-commit.d"
   local_spacecommander_dir="$DIR/spacecommander"
   $(cp -f "$local_pre_commit_file" "$githooks_path")
   $(cp -Rf "$local_pre_commit_dir" "$githooks_path")
   $(cp -Rf "$local_spacecommander_dir" "$githooks_path")
-
-  git config core.hooksPath .githooks
 }
 
 function symlink_githooks_clang_format() {
-  $(ln -sf "$githooks_path/spacecommander/.clang-format" "$CWDBASE/.clang-format")
+  source_file_path="$githooks_path/spacecommander/.clang-format"
+  if [ -f "$source_file_path" ]; then
+    $(ln -sf "$source_file_path" "$CWDBASE/.clang-format")
+  fi
 }
 
 # sync git hooks
