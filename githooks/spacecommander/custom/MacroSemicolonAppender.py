@@ -19,10 +19,11 @@ class MacroSemicolonAppender(AbstractCustomFormatter):
             needs_semicolon = len(stripped_line) > 0 and stripped_line[0].isupper() and stripped_line.endswith(")") and "(" in stripped_line
             # - The line doesn't contain any spaces before a ( [that might mean it's a C function]
             needs_semicolon = needs_semicolon and not " " in stripped_line.split("(")[0].strip()
-            # - The next line (if there is one) does not start with a brace.
+            # - The next line (if there is one) does not start with a brace or a dot (chained method call).
             if (line_number + 1) < len(lines) and lines[line_number + 1]:
                 for brace in "{", "}", "[", "]":
                     needs_semicolon = needs_semicolon and not lines[line_number + 1].lstrip().startswith(brace)
+                needs_semicolon = needs_semicolon and not lines[line_number + 1].lstrip().startswith(".")
             # This line isn't part of a macro definition (we look at the previous line to see if it ended with a \)
             needs_semicolon = needs_semicolon and not preceding_line_ends_with_backslash
             # If the prior line ends with a comma, we're part of a larger statement.
