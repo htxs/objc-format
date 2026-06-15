@@ -49,6 +49,8 @@ function ensure_hook_is_installed() {
   local_pre_commit_file="$DIR/pre-commit"
   local_pre_commit_dir="$DIR/pre-commit.d"
   local_spacecommander_dir="$DIR/spacecommander"
+  $(rm -rf "$git_hooks_path/pre-commit.d")
+  $(rm -rf "$git_hooks_path/spacecommander")
   $(cp -f "$local_pre_commit_file" "$git_hooks_path")
   $(cp -Rf "$local_pre_commit_dir" "$git_hooks_path")
   $(cp -Rf "$local_spacecommander_dir" "$git_hooks_path")
@@ -90,6 +92,8 @@ function ensure_githooks_is_installed() {
   local_pre_commit_file="$DIR/pre-commit"
   local_pre_commit_dir="$DIR/pre-commit.d"
   local_spacecommander_dir="$DIR/spacecommander"
+  $(rm -rf "$githooks_path/pre-commit.d")
+  $(rm -rf "$githooks_path/spacecommander")
   $(cp -f "$local_pre_commit_file" "$githooks_path")
   $(cp -Rf "$local_pre_commit_dir" "$githooks_path")
   $(cp -Rf "$local_spacecommander_dir" "$githooks_path")

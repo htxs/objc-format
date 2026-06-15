@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # set -ex
-# 当前脚本所在目录
-DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+# 当前执行目录，即需要安装 githooks 的工程根目录。
+DIR=$(pwd)
 tmp_githooks_zip_path="$DIR/githooks.zip"
 tmp_githooks_path="$DIR/githooks"
 download_file_url="https://raw.githubusercontent.com/htxs/objc-format/main/githooks.zip"
@@ -15,8 +15,13 @@ function ensure_down_githooks() {
     echo "rm old zip file: $tmp_githooks_zip_path"
   fi
 
-  # curl 下载文件
-  if curl -fsSL $download_file_url -o $tmp_githooks_zip_path >/dev/null 2>&1; then
+  # 避免 raw.githubusercontent.com 缓存旧 zip。
+  download_url="${download_file_url}?t=$(date +%s)"
+  if curl -fsSL \
+    -H "Cache-Control: no-cache" \
+    -H "Pragma: no-cache" \
+    "$download_url" \
+    -o "$tmp_githooks_zip_path" >/dev/null 2>&1; then
     echo "download zip file success."
   else
     echo "download zip file fail."
@@ -28,6 +33,11 @@ function ensure_down_githooks() {
 function ensure_unzip_githooks() {
   # -f 参数判断文件是否存在
   if [ -f "$tmp_githooks_zip_path" ]; then
+    if [ -d "$tmp_githooks_path" ]; then
+      rm -rf "$tmp_githooks_path"
+      echo "rm old githooks dir: $tmp_githooks_path"
+    fi
+
     if unzip -qo "$tmp_githooks_zip_path" >/dev/null 2>&1; then
       echo "unzip file success."
     else
@@ -72,4 +82,3 @@ function ensure_delete_files() {
 
 # 串行执行
 ensure_down_githooks && ensure_unzip_githooks && ensure_setup_githooks && ensure_delete_files
-
